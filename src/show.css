@@ -1,0 +1,84 @@
+.img-meme{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.wrap-canvas{
+    border:1px solid #000000;
+    position: relative;
+    top: 120px;
+    left: 200px;
+}
+.input-area{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    width: 400px;
+    height: 600px;
+   
+}
+/* input{
+    outline-style: none ;
+    border: 1px solid #ccc; 
+    border-radius: 3px;
+    padding: 10px 11px;
+    width: 320px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: "Microsoft soft";
+    margin: 15px;
+}
+input:focus{
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6)
+} */
+.button{
+    background-color: #3d83fa;
+    color: #fefefe;
+}
+.font-select{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 5px;;
+}
+.font-size{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    white-space: nowrap;
+    margin:5px;
+}
+.font-color{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 5px;
+}
+.input-wrap{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 5px;
+}
+.cover{
+    position: absolute; 
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.5);
+    animation: reveal 0.4s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.utils{
+    display: flex;
+    flex-direction:row;
+    justify-content: space-around;
+}
