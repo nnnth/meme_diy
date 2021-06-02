@@ -3,10 +3,10 @@ import { useCallback, useEffect, useState, useRef } from 'react'
 import ScrollList from './scroll_list'
 import DragText from './dragtext'
 import './show.css'
-import { DownloadOutlined, PlusCircleOutlined,CloudUploadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, PlusCircleOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import ScrollText from './scroll_text'
 
-import { Form, FormInstance, Button, Tabs,Progress,Switch,Modal,notification} from 'antd';
+import { Form, FormInstance, Button, Tabs, Progress, Switch, Modal, notification } from 'antd';
 // import Share from 'social-share-react'
 import { configs } from './configs'
 import GifText from './gif_text'
@@ -65,12 +65,12 @@ const defaulttex: TextProps = {
 export const boxsContext = createContext<Array<BoxProps>>([defaultbox])
 const maxcanvassize = 500;
 const mincanvassize = 320;
-const opensuccessNotificationWithIcon = ()=> {
+const opensuccessNotificationWithIcon = () => {
   notification["success"]({
     message: '上传成功',
     description:
       '',
-    duration:3,
+    duration: 3,
   });
 };
 function Show() {
@@ -84,8 +84,8 @@ function Show() {
   });
   const [imgurl, setImgurl] = useState("");
   const [gifinfo, setGifinfo] = useState<any>(configs[0]);
-  const [progressnum,setProgressNum] = useState<number>(-1);
-  const [showbox,setShowbox] = useState<boolean>(true);
+  const [progressnum, setProgressNum] = useState<number>(-1);
+  const [showbox, setShowbox] = useState<boolean>(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
 
@@ -203,7 +203,7 @@ function Show() {
     newtexts[index].text = value;
     setTexts(newtexts);
   }
-  
+
   const addinput = () => {
     var newboxs = boxs.slice();
     newboxs.push({
@@ -284,17 +284,17 @@ function Show() {
 
   const createWorkers = async (info: any) => {
     const tmpWorker = await fetch('/gif.worker.js'),
-        workerSrcBlob = new Blob([await tmpWorker.text()], { type: 'text/javascript' }),
-        workerBlobURL = window.URL.createObjectURL(workerSrcBlob);
+      workerSrcBlob = new Blob([await tmpWorker.text()], { type: 'text/javascript' }),
+      workerBlobURL = window.URL.createObjectURL(workerSrcBlob);
     gif.current = new GIF({
-        workerScript: workerBlobURL,
-        workers: 3,
-        quality: 16,
-        width: info.width,
-        height: info.height,
+      workerScript: workerBlobURL,
+      workers: 3,
+      quality: 16,
+      width: info.width,
+      height: info.height,
     });
-}
-const createCanvasContext = (width:number, height:number) => {
+  }
+  const createCanvasContext = (width: number, height: number) => {
     const canvas = document.createElement('canvas');
     [canvas.width, canvas.height] = [width, height]
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -303,63 +303,63 @@ const createCanvasContext = (width:number, height:number) => {
     [ctx.fillStyle, ctx.strokeStyle] = ['white', 'black'];
     [ctx.lineWidth, ctx.lineJoin] = [3, 'round'];
     return [canvas, ctx];
-}
+  }
 
-const createGif = async () => {
-     const tmp = await fetch(imgurl),
-        response = await tmp.arrayBuffer(),
-        arrayBufferView = new Uint8Array(response),
-        gifReader = new omggif.GifReader(arrayBufferView),
-        frameZeroInfo = gifReader.frameInfo(0),
-        [, ctx] = createCanvasContext(frameZeroInfo.width, frameZeroInfo.height);
+  const createGif = async () => {
+    const tmp = await fetch(imgurl),
+      response = await tmp.arrayBuffer(),
+      arrayBufferView = new Uint8Array(response),
+      gifReader = new omggif.GifReader(arrayBufferView),
+      frameZeroInfo = gifReader.frameInfo(0),
+      [, ctx] = createCanvasContext(frameZeroInfo.width, frameZeroInfo.height);
     return {
-        index: 0,
-        time: 0,
-        ctx: ctx,
-        gifReader: gifReader,
-        width: frameZeroInfo.width,
-        height: frameZeroInfo.height,
-        captions: document.querySelectorAll('.input.is-info.sentence'),
-        pixelBuffer: new Uint8ClampedArray(frameZeroInfo.width * frameZeroInfo.height * 4),
+      index: 0,
+      time: 0,
+      ctx: ctx,
+      gifReader: gifReader,
+      width: frameZeroInfo.width,
+      height: frameZeroInfo.height,
+      captions: document.querySelectorAll('.input.is-info.sentence'),
+      pixelBuffer: new Uint8ClampedArray(frameZeroInfo.width * frameZeroInfo.height * 4),
     }
-}
-const drawFrame = (info:any) => {
+  }
+  const drawFrame = (info: any) => {
     for (let i = 0; i < info.gifReader.numFrames(); i++) {
-        info.gifReader.decodeAndBlitFrameRGBA(i, info.pixelBuffer);
-        let imageData = new window.ImageData(info.pixelBuffer, info.width, info.height);
-        info.ctx.putImageData(imageData, 0, 0);
+      info.gifReader.decodeAndBlitFrameRGBA(i, info.pixelBuffer);
+      let imageData = new window.ImageData(info.pixelBuffer, info.width, info.height);
+      info.ctx.putImageData(imageData, 0, 0);
 
-        let frameInfo = info.gifReader.frameInfo(i);
-        if (info.index < gifinfo.config.length) {
-            drawCaptions(info, frameInfo)
-        }
-        var newgif = gif.current
-        newgif.addFrame(info.ctx, {
-            copy: true,
-            delay: frameInfo.delay * 10,
-            dispose: -1
-        })
-        gif.current = newgif;
+      let frameInfo = info.gifReader.frameInfo(i);
+      if (info.index < gifinfo.config.length) {
+        drawCaptions(info, frameInfo)
+      }
+      var newgif = gif.current
+      newgif.addFrame(info.ctx, {
+        copy: true,
+        delay: frameInfo.delay * 10,
+        dispose: -1
+      })
+      gif.current = newgif;
     }
-}
-const drawCaptions = (info:any, frameInfo:any) => {
+  }
+  const drawCaptions = (info: any, frameInfo: any) => {
     var textInfo = gifinfo.config[info.index];
     if (textInfo.startTime <= info.time && info.time <= textInfo.endTime) {
-        var text = undefined;
-        if (info.captions[info.index])
-            text = info.captions[info.index].value || textInfo.default;
-        else
-            text = textInfo.default;
-        info.ctx.strokeText(text, info.width / 2, info.height - 5, info.width);
-        info.ctx.fillText(text, info.width / 2, info.height - 5, info.width);
+      var text = undefined;
+      if (info.captions[info.index])
+        text = info.captions[info.index].value || textInfo.default;
+      else
+        text = textInfo.default;
+      info.ctx.strokeText(text, info.width / 2, info.height - 5, info.width);
+      info.ctx.fillText(text, info.width / 2, info.height - 5, info.width);
     }
     info.time += frameInfo.delay / 100;
     if (info.time > textInfo.endTime) {
-        info.index++;
+      info.index++;
     }
-}
+  }
 
-const downGif = () => {
+  const downGif = () => {
     let a = document.createElement('a');
     a.href = gifurl.current;
     console.log(gifurl.current);
@@ -367,25 +367,25 @@ const downGif = () => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-}
-const renderGif = () => {
+  }
+  const renderGif = () => {
     gif.current.render();
-    gif.current.on('progress', (progress:number) => {
-        setProgressNum(0|progress*100);
+    gif.current.on('progress', (progress: number) => {
+      setProgressNum(0 | progress * 100);
     })
-    gif.current.on('finished', (blob:Blob) => {
-        const img = gifMeme.current as HTMLImageElement;
-        var gifUrl = window.URL.createObjectURL(blob);
-        img.src = gifUrl;
-        console.log(gifUrl);
-        // setGifurl(gifUrl);
-        gifurl.current = gifUrl;
-        downGif();
-        setProgressNum(-1);
+    gif.current.on('finished', (blob: Blob) => {
+      const img = gifMeme.current as HTMLImageElement;
+      var gifUrl = window.URL.createObjectURL(blob);
+      img.src = gifUrl;
+      console.log(gifUrl);
+      // setGifurl(gifUrl);
+      gifurl.current = gifUrl;
+      downGif();
+      setProgressNum(-1);
 
     })
-}
-const generating = async () => {
+  }
+  const generating = async () => {
     // this.setState({ progressNum: 0 })
     setProgressNum(0);
     const info = await createGif();
@@ -393,60 +393,59 @@ const generating = async () => {
     drawFrame(info);
     renderGif();
 
-}
-const downloadimg = (save:boolean) => {
-  if(isgif.current)
-  {
-    generating();
-    return;
   }
-  var can = document.getElementById("memecanvas") as HTMLCanvasElement;
-  var a = document.createElement("a");
-  a.href = can.toDataURL();
-  a.download = "meme.jpg"
-  if(save)
-  a.click();
-  return a.href;
-}
-const handleOk = () => {
-  var imgbase64 = downloadimg(false);
-  console.log(imgbase64);
-  fetch('/users/',{ //请求的服务器地址
+  const downloadimg = (save: boolean) => {
+    if (isgif.current) {
+      generating();
+      return;
+    }
+    var can = document.getElementById("memecanvas") as HTMLCanvasElement;
+    var a = document.createElement("a");
+    a.href = can.toDataURL();
+    a.download = "meme.jpg"
+    if (save)
+      a.click();
+    return a.href;
+  }
+  const handleOk = () => {
+    var imgbase64 = downloadimg(false);
+    console.log(imgbase64);
+    fetch('/users/', { //请求的服务器地址
       body: JSON.stringify({
-       imageData: imgbase64,
-       type:"templates"
-     }),  //请求的数据
+        imageData: imgbase64,
+        type: "templates"
+      }),  //请求的数据
       // body:{name:"mumu",age:20}, //第二种请求数据的方法json
-      method:"POST", //请求方法
-      headers:{  //请求头信息
-         //  'Content-Type':'application/x-www-form-urlencoded' //用url编码形式处理数据
-          'Content-Type':'application/json' //第二种请求头编写方式json
+      method: "POST", //请求方法
+      headers: {  //请求头信息
+        //  'Content-Type':'application/x-www-form-urlencoded' //用url编码形式处理数据
+        'Content-Type': 'application/json' //第二种请求头编写方式json
       }
-  })
-  .then(res=>res.text()) //请求得到的数据转换为text
-  .then(res=>{
-    setIsModalVisible(false);
-    opensuccessNotificationWithIcon();
-    imgRef.current.refresh();
-  })
-  .catch(err=>{    //错误打印
-      console.log(err)
-  })
-  
-};
+    })
+      .then(res => res.text()) //请求得到的数据转换为text
+      .then(res => {
+        setIsModalVisible(false);
+        opensuccessNotificationWithIcon();
+        imgRef.current.refresh();
+      })
+      .catch(err => {    //错误打印
+        console.log(err)
+      })
 
-const handleCancel = () => {
-  setIsModalVisible(false);
-};
-const upload = ()=>{
-  setIsModalVisible(true);
-}
-const hidebox = ()=>{
-  if(showbox)
-    setShowbox(false);
-  else
-    setShowbox(true);
-}
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+  const upload = () => {
+    setIsModalVisible(true);
+  }
+  const hidebox = () => {
+    if (showbox)
+      setShowbox(false);
+    else
+      setShowbox(true);
+  }
 
 
 
@@ -457,27 +456,21 @@ const hidebox = ()=>{
           {isgif.current ? <img src={imgurl} alt="show gif" ref={gifMeme} style={imgsize}></img> :
             <div>
               <canvas id="memecanvas" onClick={() => fileRef.current?.click()}></canvas>
-              {showbox?boxs.map((item, index: number) => <DragText key={item.id} id={index} onChange={setPos}></DragText>):""}
+              {showbox ? boxs.map((item, index: number) => <DragText key={item.id} id={index} onChange={setPos}></DragText>) : ""}
             </div>}
           <div className="utils">
-          <Button style={{marginTop:20}} icon={<CloudUploadOutlined/>} onClick={upload}></Button>
-          <Button
-            type="primary" style={{marginTop:20}}onClick={()=>downloadimg(true)} shape="round" icon={<DownloadOutlined />}>
-            下载
+            <Button style={{ marginTop: 20 }} icon={<CloudUploadOutlined />} onClick={upload}></Button>
+            <Button
+              type="primary" style={{ marginTop: 20 }} onClick={() => downloadimg(true)} shape="round" icon={<DownloadOutlined />}>
+              下载
           </Button>
-          {/* <Share downloadimg={downloadimg}></Share> */}
-          {/* <Share
-          url='https://www.baidu.com'
-          title="meme"
-          disabled={['google', 'facebook', 'twitter']}
-        ></Share> */}
-        <Switch disabled={isgif.current} defaultChecked onChange={hidebox}  style={{marginTop:25}}></Switch>
-        <Modal title="上传模板" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-        <p>上传的模板将会被所有打开该网站的用户看到</p>
-        <p>请不要上传模板以外的图片</p>
-        <p>上传的模板刷新后显示在右侧</p>
-        <p>感谢您为本网站贡献模板！</p>
-      </Modal>
+            <Switch disabled={isgif.current} defaultChecked onChange={hidebox} style={{ marginTop: 25 }}></Switch>
+            <Modal title="上传模板" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+              <p>上传的模板将会被所有打开该网站的用户看到</p>
+              <p>请不要上传模板以外的图片</p>
+              <p>上传的模板刷新后显示在右侧</p>
+              <p>感谢您为本网站贡献模板！</p>
+            </Modal>
           </div>
         </div>
         <input
@@ -497,10 +490,14 @@ const hidebox = ()=>{
           </TabPane>
           <TabPane tab="TEXT" key="3">
             <Form className="input-area" ref={inputRef}>
-              {/* {texts.map((item, index: number) =>
-                <Custom item={item}
-                  index={index}
-                  key={item.id}
+              {isgif.current ? "" : <Button style={{ marginTop: 8 }} type="default" icon={<PlusCircleOutlined />} onClick={addinput}>
+                新增文本框
+                  </Button>}
+              {isgif.current ?
+                <GifText config={gifinfo.config}></GifText> :
+
+                <ScrollText
+                  texts={texts}
                   textChange={textChange}
                   addinput={addinput}
                   deleteinput={deleteinput}
@@ -508,34 +505,17 @@ const hidebox = ()=>{
                   onFontChange={onFontChange}
                   onFontSizeChange={onFontSizeChange}
                   changevis={changevis}>
-                </Custom>
-              )} */}
-              {isgif.current?"":<Button style={{ marginTop: 8 }} type="default" icon={<PlusCircleOutlined />} onClick={addinput}>
-                    新增文本框
-                  </Button>}
-              {isgif.current ?
-                <GifText config={gifinfo.config}></GifText> :
-                  
-                  <ScrollText
-                    texts={texts}
-                    textChange={textChange}
-                    addinput={addinput}
-                    deleteinput={deleteinput}
-                    onColorChange={onColorChange}
-                    onFontChange={onFontChange}
-                    onFontSizeChange={onFontSizeChange}
-                    changevis={changevis}>
-                  </ScrollText>}
+                </ScrollText>}
 
 
             </Form>
           </TabPane>
         </Tabs>
       </div>
-      {progressnum>0?
+      {progressnum > 0 ?
         <div className="cover">
-          <Progress type="circle" percent={progressnum}/>
-        </div>:""}
+          <Progress type="circle" percent={progressnum} />
+        </div> : ""}
     </boxsContext.Provider>
   );
 }
