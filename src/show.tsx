@@ -6,8 +6,7 @@ import './show.css'
 import { DownloadOutlined, PlusCircleOutlined,CloudUploadOutlined } from '@ant-design/icons';
 import ScrollText from './scroll_text'
 
-import { Form, FormInstance, Button, Tabs,Progress,Switch} from 'antd';
-import Share from './share'
+import { Form, FormInstance, Button, Tabs,Progress,Switch,Modal,notification} from 'antd';
 // import Share from 'social-share-react'
 import { configs } from './configs'
 import GifText from './gif_text'
@@ -50,10 +49,10 @@ type TextProps = {
 }
 const defaultbox: BoxProps = {
   id: 0,
-  left: 50,
-  top: 20,
-  height: 30,
-  width: 200,
+  left: 80,
+  top: 300,
+  height: 40,
+  width: 350,
 }
 const defaulttex: TextProps = {
   id: 0,
@@ -64,11 +63,16 @@ const defaulttex: TextProps = {
   show: false,
 }
 export const boxsContext = createContext<Array<BoxProps>>([defaultbox])
-const devicePixelRatio = window.devicePixelRatio;
 const maxcanvassize = 500;
 const mincanvassize = 320;
-const fontoptions = ["Arial", "Helvetica", "Impact", "Arial Black", "Times New Roman", "Trebuchet MS", "Comic SansMS", "Andale Mono"];
-
+const opensuccessNotificationWithIcon = ()=> {
+  notification["success"]({
+    message: '上传成功',
+    description:
+      '',
+    duration:3,
+  });
+};
 function Show() {
   const [boxs, setBoxs] = useState<Array<BoxProps>>([defaultbox]);
   const [texts, setTexts] = useState<Array<TextProps>>([defaulttex]);
@@ -82,6 +86,8 @@ function Show() {
   const [gifinfo, setGifinfo] = useState<any>(configs[0]);
   const [progressnum,setProgressNum] = useState<number>(-1);
   const [showbox,setShowbox] = useState<boolean>(true);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
 
   // const [gif, setGif] = useState<any>();
   const gif = useRef<any>(null!);
@@ -95,6 +101,9 @@ function Show() {
   const count_index = useRef<number>(1);
   const isgif = useRef<boolean>(false);
   const gifMeme = useRef<HTMLImageElement>(null!);
+  const imgRef = useRef<any>(null!);
+  const gifRef = useRef<any>(null!);
+
   const drawCanvas = useCallback(() => {
     var canvas = document.getElementById("memecanvas") as HTMLCanvasElement;
     canvas.width = imgsize.width;
@@ -235,7 +244,7 @@ function Show() {
   }
   useEffect(() => {
     if (!isgif.current) {
-      loadimgurl('/logo192.png');
+      loadimgurl('/templates/0.jpg');
       drawCanvas();
     }
   }, []);
@@ -399,7 +408,7 @@ const downloadimg = (save:boolean) => {
   a.click();
   return a.href;
 }
-const upload = ()=>{
+const handleOk = () => {
   var imgbase64 = downloadimg(false);
   console.log(imgbase64);
   fetch('/users/',{ //请求的服务器地址
@@ -416,11 +425,21 @@ const upload = ()=>{
   })
   .then(res=>res.text()) //请求得到的数据转换为text
   .then(res=>{
-    console.log(res);
+    setIsModalVisible(false);
+    opensuccessNotificationWithIcon();
+    imgRef.current.refresh();
   })
   .catch(err=>{    //错误打印
       console.log(err)
   })
+  
+};
+
+const handleCancel = () => {
+  setIsModalVisible(false);
+};
+const upload = ()=>{
+  setIsModalVisible(true);
 }
 const hidebox = ()=>{
   if(showbox)
@@ -452,8 +471,13 @@ const hidebox = ()=>{
           title="meme"
           disabled={['google', 'facebook', 'twitter']}
         ></Share> */}
-        <Switch disabled={isgif.current} defaultChecked onChange={hidebox} style={{marginTop:25}}></Switch>
-         
+        <Switch disabled={isgif.current} defaultChecked onChange={hidebox}  style={{marginTop:25}}></Switch>
+        <Modal title="上传模板" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+        <p>上传的模板将会被所有打开该网站的用户看到</p>
+        <p>请不要上传模板以外的图片</p>
+        <p>上传的模板刷新后显示在右侧</p>
+        <p>感谢您为本网站贡献模板！</p>
+      </Modal>
           </div>
         </div>
         <input
@@ -466,10 +490,10 @@ const hidebox = ()=>{
 
         <Tabs>
           <TabPane tab="GIF" key="1">
-            <ScrollList className="scroll-list" onClick={loadimgurl} path="gifs/"></ScrollList>
+            <ScrollList className="scroll-list" onClick={loadimgurl} path="gifs/" cref={gifRef}></ScrollList>
           </TabPane>
           <TabPane tab="IMG" key="2">
-            <ScrollList className="scroll-list" onClick={loadimgurl} path="templates/"></ScrollList>
+            <ScrollList className="scroll-list" onClick={loadimgurl} path="templates/" cref={imgRef}></ScrollList>
           </TabPane>
           <TabPane tab="TEXT" key="3">
             <Form className="input-area" ref={inputRef}>

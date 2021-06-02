@@ -1,11 +1,9 @@
-import React, { useRef } from 'react';
-import logo from './logo.svg';
+import React, {useState } from 'react';
 import './App.css';
 import Show from './show'
-import Gif from './gifmeme'
-import DragText from './dragtext'
 import 'antd/dist/antd.css';
 import Title from './head'
+import PrePage from './prepage'
 
 
 function App() {
@@ -22,11 +20,17 @@ function App() {
   //   ctx.createImageData(imagedata);
   //   }
   // }
+  const [enter,setEnter] = useState<boolean>(false);
+  const onClick = ()=>
+  {
+    setEnter(true);
+  }
   return (
      <div className="App">
+       {enter?
+      <div>
       <Title></Title>
-       <Show></Show>
-       {/* <Gif></Gif> */}
+       <Show></Show></div>:<PrePage onClick={onClick}></PrePage>}
      </div>
    );
 }

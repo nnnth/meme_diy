@@ -1,19 +1,20 @@
 import React from 'react'
 import  './prepage.css'
-function prepage() {
+
+function PrePage(props:any) {
     return (
         <header className="header">
             <div className="brand-box">
-                <span className="brand">Example Brand</span>
+                <span className="brand">Meme Diy</span>
             </div>
-
             <div className="text-box">
                 <h1 className="heading-primary">
-                    <span className="heading-primary-main">Heading Primary Main</span>
-                    <span className="heading-primary-sub">The secondary heading</span>
+                    <span className="heading-primary-main">表情包生成器</span>
+                    <span className="heading-primary-sub">使用模板或自定义图片生成表情包 支持图片和动图</span>
                 </h1>
-                <a href="#" className="btn btn-white btn-animated">Discover our tours</a>
+                <a href="#" className="btn btn-white btn-animated" onClick={props.onClick}>Get Started</a>
             </div>
         </header>
     )
 }
+export default PrePage;

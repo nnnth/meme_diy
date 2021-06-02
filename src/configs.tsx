@@ -178,4 +178,34 @@ const config_weisuoyuwei = {
         }
     ]
 };
-export const  configs = [config_dagong,config_lianliankan,config_shuifandui,config_wangjingze,config_weisuoyuwei,config_woshuode,];
+const config_yincha = {
+    "name": "饮茶先",
+    "config": [
+        {
+            "default": "喂",
+            "startTime": 0,
+            "endTime": 1
+        },
+        {
+            "default": "三点几嚟",
+            "startTime": 1.5,
+            "endTime": 2.9,
+        },
+        {
+            "default": "做 做橪啊做",
+            "startTime": 3,
+            "endTime": 4,
+        },
+        {
+            "default": "饮茶先啦",
+            "startTime": 4.8,
+            "endTime": 5.7,
+        },
+        {
+            "default": "三点几饮 饮茶先啦",
+            "startTime": 5.8,
+            "endTime": 7,
+        }
+    ]
+};
+export const  configs = [config_dagong,config_lianliankan,config_shuifandui,config_wangjingze,config_weisuoyuwei,config_woshuode,config_yincha];
